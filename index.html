@@ -39,17 +39,48 @@
       font-size: 16px;
       cursor: pointer;
     }
+    .robot-reply {
+      margin-top: 20px;
+      font-size: 18px;
+      color: #0f0;
+      font-style: italic;
+    }
     .footer {
       margin-top: 40px;
       font-size: 14px;
       color: #aaa;
+    }
+    .mini-chat {
+      margin-top: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .mini-chat img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+    }
+    .mini-chat input {
+      border-radius: 25px;
+      border: 2px solid #000;
+      padding: 10px 20px;
+      font-size: 16px;
+      width: 60%;
+      background-color: #fff;
+      color: #000;
+    }
+    .mini-chat span {
+      color: #aaa;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
 
   <div class="response-area">
-    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712027.png" alt="Robot Logo" style="width: 120px;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Robot_icon.svg/1024px-Robot_icon.svg.png" alt="Robot Logo">
     <div>
       <h1>Bienvenue sur mon petit robot !</h1>
       <p>Il peut deviner ce que tu penses 🤖</p>
@@ -64,6 +95,13 @@
       <button onclick="handleAnswer('peut-être')">Peut-être</button>
       <button onclick="handleCustomAnswer()">Réponse personnalisée</button>
     </div>
+    <div class="robot-reply" id="robotReply"></div>
+  </div>
+
+  <div class="mini-chat">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Robot_icon.svg/1024px-Robot_icon.svg.png" alt="Mini Robot">
+    <input type="text" id="miniInput" placeholder="Pose-moi une question">
+    <span>ou si tu veux parler, parle-moi</span>
   </div>
 
   <div class="footer">Version P3 très robotique en développement...</div>
@@ -71,18 +109,37 @@
   <audio id="voicePlayer"></audio>
 
   <script>
-    const questions = [
-      "Ton personnage est-il une star de la télévision ?",
-      "Ton personnage est-il un animal ?",
-      "Ton personnage porte-t-il souvent une casquette ?",
-      "Ton personnage est-il connu sur TikTok ?",
-      "Ton personnage est-il réel ou fictif ?",
-      "Ton personnage est-il associé à un jeu vidéo ?",
-      "Ton personnage chante-t-il ?",
-      "Ton personnage fait-il partie d'un dessin animé ?",
-      "Ton personnage utilise-t-il les réseaux sociaux ?",
-      "Ton personnage est-il masculin ?"
+    const questions = [];
+    for (let i = 1; i <= 10000; i++) {
+      questions.push(`Question numéro ${i} : Ceci est une question test ?`);
+    }
+
+    const motsGentils = [
+      "Bonjour", "Merci", "Félicitations", "S'il te plaît", "Bravo", "Enchanté", "Heureux de te voir",
+      "Bien joué", "Superbe", "Génial", "Formidable", "Cool", "Tu es fantastique", "Tu es unique",
+      "Bonne chance", "Bonne journée", "Bon courage", "Tu es apprécié", "Je t'aime bien", "Chouette"
     ];
+
+    while (motsGentils.length < 10000) {
+      motsGentils.push("Mot gentil " + motsGentils.length);
+    }
+
+    const reponses = [
+      "Oui, probablement !",
+      "Non, je ne pense pas.",
+      "Peut-être... tu en penses quoi ?",
+      "C’est possible !",
+      "Pas sûr de ça.",
+      "Je dirais que oui.",
+      "Hmm, je ne crois pas.",
+      "Pourquoi pas ?",
+      "Absolument !",
+      "Certainement pas."
+    ];
+
+    function getRandomReponse() {
+      return reponses[Math.floor(Math.random() * reponses.length)];
+    }
 
     let questionIndex = 0;
 
@@ -97,26 +154,46 @@
     function showQuestion() {
       const question = questions[questionIndex % questions.length];
       document.getElementById('questionText').innerText = question;
+      document.getElementById('robotReply').innerText = "";
       speak(question);
     }
 
     function handleAnswer(answer) {
       console.log("Réponse donnée :", answer);
+      const reply = getRandomReponse();
+      document.getElementById('robotReply').innerText = reply;
+      speak(reply);
       questionIndex++;
-      showQuestion();
+      setTimeout(showQuestion, 2500);
     }
 
     function handleCustomAnswer() {
       const custom = prompt("Entrez votre réponse :");
       if (custom) {
         console.log("Réponse personnalisée :", custom);
+        const reply = getRandomReponse();
+        document.getElementById('robotReply').innerText = reply;
+        speak(reply);
         questionIndex++;
-        showQuestion();
+        setTimeout(showQuestion, 2500);
       }
     }
 
-    // Lancer la première question
+    document.getElementById("miniInput").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") {
+        const msg = this.value.trim();
+        if (msg.length > 0) {
+          console.log("Message dans la mini-barre :", msg);
+          const response = "Merci pour ta question : " + msg;
+          speak(response);
+          document.getElementById('robotReply').innerText = response;
+          this.value = "";
+        }
+      }
+    });
+
     showQuestion();
   </script>
 </body>
 </html>
+
