@@ -64,7 +64,7 @@
     }
     .mini-chat input {
       border-radius: 25px;
-      border: 2px solid #000;
+      border: 2px solid #fff;
       padding: 10px 20px;
       font-size: 16px;
       width: 60%;
@@ -80,7 +80,7 @@
 <body>
 
   <div class="response-area">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Robot_icon.svg/1024px-Robot_icon.svg.png" alt="Robot Logo">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Robot_icon.svg/1024px-Robot_icon.svg.png" alt="Robot Logo" onerror="this.style.display='none'">
     <div>
       <h1>Bienvenue sur mon petit robot !</h1>
       <p>Il peut deviner ce que tu penses 🤖</p>
@@ -106,23 +106,15 @@
 
   <div class="footer">Version P3 très robotique en développement...</div>
 
-  <audio id="voicePlayer"></audio>
-
   <script>
-    const questions = [];
-    for (let i = 1; i <= 10000; i++) {
-      questions.push(`Question numéro ${i} : Ceci est une question test ?`);
-    }
+    const questions = Array.from({length: 10000}, (_, i) => `Question numéro ${i+1} : Ceci est une question test ?`);
 
     const motsGentils = [
       "Bonjour", "Merci", "Félicitations", "S'il te plaît", "Bravo", "Enchanté", "Heureux de te voir",
       "Bien joué", "Superbe", "Génial", "Formidable", "Cool", "Tu es fantastique", "Tu es unique",
       "Bonne chance", "Bonne journée", "Bon courage", "Tu es apprécié", "Je t'aime bien", "Chouette"
     ];
-
-    while (motsGentils.length < 10000) {
-      motsGentils.push("Mot gentil " + motsGentils.length);
-    }
+    while (motsGentils.length < 10000) motsGentils.push("Mot gentil " + motsGentils.length);
 
     const reponses = [
       "Oui, probablement !",
@@ -137,18 +129,14 @@
       "Certainement pas."
     ];
 
-    function getRandomReponse() {
-      return reponses[Math.floor(Math.random() * reponses.length)];
-    }
-
     let questionIndex = 0;
 
     function speak(text) {
-      const audio = document.getElementById('voicePlayer');
-      const encodedText = encodeURIComponent(text);
-      const url = `https://api.streamelements.com/kappa/v2/speech?voice=Brian&text=${encodedText}`;
-      audio.src = url;
-      audio.play();
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'fr-FR';
+        speechSynthesis.speak(utterance);
+      }
     }
 
     function showQuestion() {
@@ -159,8 +147,7 @@
     }
 
     function handleAnswer(answer) {
-      console.log("Réponse donnée :", answer);
-      const reply = getRandomReponse();
+      const reply = reponses[Math.floor(Math.random() * reponses.length)];
       document.getElementById('robotReply').innerText = reply;
       speak(reply);
       questionIndex++;
@@ -170,8 +157,7 @@
     function handleCustomAnswer() {
       const custom = prompt("Entrez votre réponse :");
       if (custom) {
-        console.log("Réponse personnalisée :", custom);
-        const reply = getRandomReponse();
+        const reply = reponses[Math.floor(Math.random() * reponses.length)];
         document.getElementById('robotReply').innerText = reply;
         speak(reply);
         questionIndex++;
@@ -183,7 +169,6 @@
       if (e.key === "Enter") {
         const msg = this.value.trim();
         if (msg.length > 0) {
-          console.log("Message dans la mini-barre :", msg);
           const response = "Merci pour ta question : " + msg;
           speak(response);
           document.getElementById('robotReply').innerText = response;
@@ -196,4 +181,3 @@
   </script>
 </body>
 </html>
-
