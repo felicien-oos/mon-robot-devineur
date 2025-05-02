@@ -214,7 +214,49 @@ function speak(text) {
     });
 
     window.addEventListener("DOMContentLoaded", showNextQuestion);
-  </script>
+  </script><script>
+  // ... tout ton code au-dessus reste inchangé ...
+
+  function speak(text) {
+    const synth = window.speechSynthesis;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "fr-FR";
+    utterance.pitch = 1;
+    utterance.rate = 1;
+    synth.cancel();
+    synth.speak(utterance);
+  }
+
+  function showNextQuestion() {
+    if (current >= shuffledQuestions.length || possibilities.length <= 1) {
+      const q = document.querySelector(".question");
+      if (possibilities.length === 0) {
+        q.textContent = "Je n'ai pas pu deviner 😢";
+        speak("Je n'ai pas pu deviner.");
+      } else {
+        q.textContent = `Je pense à : ${possibilities[0].name} ! 🤖`;
+        speak(`Je pense à ${possibilities[0].name}`);
+      }
+      return;
+    }
+
+    while (current < shuffledQuestions.length && askedKeys.has(shuffledQuestions[current].key)) {
+      current++;
+    }
+
+    if (!shuffledQuestions[current]) {
+      document.querySelector(".question").textContent = "Plus de questions disponibles.";
+      speak("Plus de questions disponibles.");
+      return;
+    }
+
+    const question = shuffledQuestions[current];
+    askedKeys.add(question.key);
+    document.querySelector(".question").textContent = question.text;
+    speak(question.text); // <--- fait parler la question
+  }
+</script>
+
 </body>
 </html>
 
