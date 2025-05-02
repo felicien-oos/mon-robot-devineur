@@ -109,7 +109,7 @@
 
       <div class="response-area">
         <img src="logo_robot.jpg" alt="Avatar Robot" style="width: 50px;">
-        <input type="text" placeholder="Réponse personnalisée...">
+        <input type="text" placeholder="Réponse personnalisée..." id="custom-input">
       </div>
     </div>
   </div>
@@ -119,57 +119,76 @@
   </div>
 
   <script>
-    const characters = Array.from({ length: 5000 }, (_, i) => ({
-      name: `Personnage ${i + 1}`,
-      traits: {
-        fille: Math.random() < 0.5,
-        animal: Math.random() < 0.5,
-        masculin: Math.random() < 0.5,
-        tiktok: Math.random() < 0.5,
-        youtube: Math.random() < 0.5,
-        casquette: Math.random() < 0.5,
-        virtuel: Math.random() < 0.5
-      }
-    }));
+    const traits = Array.from({ length: 5000 }, (_, i) => `trait_${i + 1}`);
 
-    const baseQuestions = [
-      { key: "fille", text: ["Est-ce que ton personnage est une fille ?"] },
-      { key: "animal", text: ["Ton personnage est-il un animal ?"] },
-      { key: "masculin", text: ["Ton personnage est-il un garçon ?"] },
-      { key: "tiktok", text: ["Ton personnage est-il célèbre sur TikTok ?"] },
-      { key: "youtube", text: ["Ton personnage fait-il des vidéos sur YouTube ?"] },
-      { key: "casquette", text: ["Ton personnage porte-t-il une casquette ?"] },
-      { key: "virtuel", text: ["Ton personnage est-il virtuel ?"] }
-    ];
-
-    const questions = Array.from({ length: 100 }, (_, i) => {
-      const trait = baseQuestions[i % baseQuestions.length];
-      return { text: trait.text[0], key: trait.key };
+    const characters = Array.from({ length: 10000 }, (_, i) => {
+      const traitsObj = {};
+      traits.forEach(trait => {
+        traitsObj[trait] = Math.random() < 0.5;
+      });
+      return {
+        name: `Personnage ${i + 1}`,
+        traits: traitsObj
+      };
     });
 
+    const questions = traits.map(trait => ({ text: `Ton personnage a-t-il le trait suivant : ${trait} ?`, key: trait }));
+    const shuffledQuestions = questions.sort(() => 0.5 - Math.random());
+
     let current = 0;
+    let askedKeys = new Set();
     let possibilities = [...characters];
 
     function showNextQuestion() {
-      if (current >= questions.length || possibilities.length <= 1) {
+      if (current >= shuffledQuestions.length || possibilities.length <= 1) {
         const q = document.querySelector(".question");
         if (possibilities.length === 0) q.textContent = "Je n'ai pas pu deviner 😢";
         else q.textContent = `Je pense à : ${possibilities[0].name} ! 🤖`;
         return;
       }
 
-      document.querySelector(".question").textContent = questions[current].text;
+      while (current < shuffledQuestions.length && askedKeys.has(shuffledQuestions[current].key)) {
+        current++;
+      }
+
+      if (!shuffledQuestions[current]) {
+        document.querySelector(".question").textContent = "Plus de questions disponibles.";
+        return;
+      }
+
+      const question = shuffledQuestions[current];
+      askedKeys.add(question.key);
+      document.querySelector(".question").textContent = question.text;
       const audio = document.getElementById("robot-voice");
       if (audio) audio.play();
     }
 
     function filterCharacters(answer) {
-      const key = questions[current].key;
+      const key = shuffledQuestions[current]?.key;
+      if (!key) return;
+
       if (answer === "oui") possibilities = possibilities.filter(c => c.traits[key] === true);
       else if (answer === "non") possibilities = possibilities.filter(c => c.traits[key] === false);
+      else if (answer === "peut-être") possibilities = possibilities.filter(c => c.traits[key] !== undefined);
+
       current++;
       showNextQuestion();
     }
+
+    document.getElementById("custom-input").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        const input = event.target.value.toLowerCase();
+        if (input.includes("oui")) filterCharacters("oui");
+        else if (input.includes("non")) filterCharacters("non");
+        else if (input.includes("peut")) filterCharacters("peut-être");
+        else {
+          document.querySelector(".question").textContent = "Merci pour ta réponse ! Passons à la suivante.";
+          current++;
+          showNextQuestion();
+        }
+        event.target.value = "";
+      }
+    });
 
     window.addEventListener("DOMContentLoaded", showNextQuestion);
   </script>
