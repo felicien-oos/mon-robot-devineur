@@ -92,7 +92,7 @@
 </head>
 <body>
   <div class="logo">
-    <img src="logo_robot.jpg" alt="Robot Logo" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Robot_icon.svg/1024px-Robot_icon.svg.png';">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Robot_icon.svg/1024px-Robot_icon.svg.png" alt="Robot Logo">
   </div>
 
   <h1>Bienvenue sur mon petit robot !<br>Il peut deviner ce que tu penses 🤖</h1>
@@ -106,7 +106,7 @@
       <button class="response-button" onclick="filterCharacters('peut-être')">Peut-être</button>
 
       <div class="response-area">
-        <img src="logo_robot.jpg" alt="Avatar Robot" style="width: 50px;" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Robot_icon.svg/1024px-Robot_icon.svg.png';">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Robot_icon.svg/1024px-Robot_icon.svg.png" alt="Avatar Robot" style="width: 50px;">
         <input type="text" placeholder="Réponse personnalisée..." id="custom-input">
       </div>
     </div>
@@ -127,17 +127,46 @@
 
     const traits = traitsDescriptions.map((desc, i) => ({ key: `trait_${i+1}`, description: desc }));
 
-    const characters = Array.from({ length: 100 }, (_, i) => {
+    const predefinedCharacters = [
+      {
+        name: "Torrell",
+        traits: {
+          trait_1: false,
+          trait_2: true,
+          trait_3: true,
+          trait_4: false,
+          trait_5: false,
+          trait_6: false,
+          trait_7: true,
+          trait_8: false,
+          trait_9: false,
+          trait_10: true,
+          trait_11: false,
+          trait_12: true,
+          trait_13: false,
+          trait_14: true,
+          trait_15: true,
+          trait_16: false,
+          trait_17: true,
+          trait_18: false,
+          trait_19: true,
+          trait_20: false
+        }
+      }
+    ];
+
+    const generatedCharacters = Array.from({ length: 99 }, (_, i) => {
       const traitsObj = {};
       traits.forEach(trait => {
         traitsObj[trait.key] = Math.random() < 0.5;
       });
       return {
-        name: `Personnage ${i + 1}`,
+        name: `Personnage ${i + 2}`,
         traits: traitsObj
       };
     });
 
+    const characters = [...predefinedCharacters, ...generatedCharacters];
     const questions = traits.map(trait => ({ text: `Ton personnage ${trait.description} ?`, key: trait.key }));
     const shuffledQuestions = questions.sort(() => 0.5 - Math.random());
 
