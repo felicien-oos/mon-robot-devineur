@@ -91,10 +91,8 @@
   </style>
 </head>
 <body>
-  <audio id="robot-voice" src="https://upload.wikimedia.org/wikipedia/commons/8/84/Beep-beep.mp3"></audio>
-
   <div class="logo">
-    <img src="logo_robot.jpg" alt="Robot Logo">
+    <img src="logo_robot.jpg" alt="Robot Logo" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Robot_icon.svg/1024px-Robot_icon.svg.png';">
   </div>
 
   <h1>Bienvenue sur mon petit robot !<br>Il peut deviner ce que tu penses 🤖</h1>
@@ -108,7 +106,7 @@
       <button class="response-button" onclick="filterCharacters('peut-être')">Peut-être</button>
 
       <div class="response-area">
-        <img src="logo_robot.jpg" alt="Avatar Robot" style="width: 50px;">
+        <img src="logo_robot.jpg" alt="Avatar Robot" style="width: 50px;" onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Robot_icon.svg/1024px-Robot_icon.svg.png';">
         <input type="text" placeholder="Réponse personnalisée..." id="custom-input">
       </div>
     </div>
@@ -119,28 +117,20 @@
   </div>
 
   <script>
-    const traits = [
-      "a des lunettes", "porte un chapeau", "est un animal", "parle plusieurs langues",
-      "est un super-héros", "est un méchant", "est une femme", "a une moustache",
-      "est un enfant", "porte des vêtements rouges", "vit dans un château", "vole dans le ciel",
-      "vient de l’espace", "a une voix grave", "est timide", "a beaucoup d’amis",
-      "est très intelligent", "a une épée", "est petit", "est très grand",
-      "porte un uniforme", "a des pouvoirs magiques", "a une queue", "est un robot",
-      "vit sous l’eau", "est connu sur Internet", "est très rapide", "est très fort",
-      "est un animal domestique", "est célèbre pour ses blagues", "a un accent",
-      "a des cheveux bleus", "utilise un ordinateur", "porte des lunettes de soleil",
-      "a un animal de compagnie", "a un frère ou une sœur", "a peur du noir",
-      "est une star de la télévision", "travaille à l’école", "a une grande bouche",
-      "est un personnage de dessin animé", "vit dans une forêt", "mange souvent des gâteaux",
-      "porte des bottes", "est curieux", "est un extraterrestre", "porte une cape",
-      "est un héros de jeu vidéo", "parle avec une voix bizarre", "a un rire unique",
-      "est souvent en colère", "est toujours joyeux"
+    const traitsDescriptions = [
+      "a les cheveux blonds", "porte des lunettes", "est un héros", "vit sous la mer", "peut voler",
+      "a une cape", "joue dans des films", "est un animal", "vient d'un dessin animé", "est très fort",
+      "porte un chapeau", "est une star de la télévision", "vit dans un château", "a un accent célèbre",
+      "est très intelligent", "a un pouvoir magique", "est célèbre sur Internet", "a une moustache",
+      "est connu des enfants", "est dans un jeu vidéo"
     ];
 
-    const characters = Array.from({ length: 10000 }, (_, i) => {
+    const traits = traitsDescriptions.map((desc, i) => ({ key: `trait_${i+1}`, description: desc }));
+
+    const characters = Array.from({ length: 100 }, (_, i) => {
       const traitsObj = {};
       traits.forEach(trait => {
-        traitsObj[trait] = Math.random() < 0.5;
+        traitsObj[trait.key] = Math.random() < 0.5;
       });
       return {
         name: `Personnage ${i + 1}`,
@@ -148,7 +138,7 @@
       };
     });
 
-    const questions = traits.map(trait => ({ text: `Ton personnage ${trait} ?`, key: trait }));
+    const questions = traits.map(trait => ({ text: `Ton personnage ${trait.description} ?`, key: trait.key }));
     const shuffledQuestions = questions.sort(() => 0.5 - Math.random());
 
     let current = 0;
@@ -175,18 +165,10 @@
       const question = shuffledQuestions[current];
       askedKeys.add(question.key);
       document.querySelector(".question").textContent = question.text;
-      const audio = document.querySelector(".question").textContent = question.text;
-speak(question.text);
-function speak(text) {
-  const synth = window.speechSynthesis;
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = "fr-FR";
-  utterance.pitch = 1;
-  utterance.rate = 1;
-  synth.cancel(); // stop previous if any
-  synth.speak(utterance);
-}
 
+      const utterance = new SpeechSynthesisUtterance(question.text);
+      utterance.lang = 'fr-FR';
+      speechSynthesis.speak(utterance);
     }
 
     function filterCharacters(answer) {
@@ -214,49 +196,7 @@ function speak(text) {
     });
 
     window.addEventListener("DOMContentLoaded", showNextQuestion);
-  </script><script>
-  // ... tout ton code au-dessus reste inchangé ...
-
-  function speak(text) {
-    const synth = window.speechSynthesis;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "fr-FR";
-    utterance.pitch = 1;
-    utterance.rate = 1;
-    synth.cancel();
-    synth.speak(utterance);
-  }
-
-  function showNextQuestion() {
-    if (current >= shuffledQuestions.length || possibilities.length <= 1) {
-      const q = document.querySelector(".question");
-      if (possibilities.length === 0) {
-        q.textContent = "Je n'ai pas pu deviner 😢";
-        speak("Je n'ai pas pu deviner.");
-      } else {
-        q.textContent = `Je pense à : ${possibilities[0].name} ! 🤖`;
-        speak(`Je pense à ${possibilities[0].name}`);
-      }
-      return;
-    }
-
-    while (current < shuffledQuestions.length && askedKeys.has(shuffledQuestions[current].key)) {
-      current++;
-    }
-
-    if (!shuffledQuestions[current]) {
-      document.querySelector(".question").textContent = "Plus de questions disponibles.";
-      speak("Plus de questions disponibles.");
-      return;
-    }
-
-    const question = shuffledQuestions[current];
-    askedKeys.add(question.key);
-    document.querySelector(".question").textContent = question.text;
-    speak(question.text); // <--- fait parler la question
-  }
-</script>
-
+  </script>
 </body>
 </html>
 
