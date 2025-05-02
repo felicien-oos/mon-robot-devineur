@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>G-Tube IA - Devine ce que tu penses</title>
+  <style>
+    body {
+      background-color: #000;
+      font-family: 'Arial', sans-serif;
+      color: white;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+
+    .logo {
+      margin-top: 30px;
+    }
+
+    .logo img {
+      width: 120px;
+      height: auto;
+    }
+
+    h1 {
+      font-size: 26px;
+      margin: 20px auto;
+      color: #0ff;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .question-box {
+      margin: 40px auto;
+      background-color: #111;
+      border-radius: 20px;
+      padding: 30px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 0 15px rgba(0,255,255,0.2);
+    }
+
+    .question {
+      font-size: 22px;
+      margin-bottom: 30px;
+    }
+
+    .responses {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .response-button {
+      background-color: white;
+      color: black;
+      padding: 12px 24px;
+      border-radius: 25px;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      width: 200px;
+    }
+
+    .response-button:hover {
+      background-color: #ddd;
+    }
+
+    .response-area {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .response-area img {
+      width: 50px;
+    }
+
+    .response-area input {
+      padding: 10px;
+      border-radius: 15px;
+      border: none;
+      width: 250px;
+      font-size: 16px;
+    }
+
+    .footer {
+      margin-top: 40px;
+      font-size: 14px;
+      color: #888;
+    }
+  </style>
+  <script>
+    const characters = [];
+
+    for (let i = 0; i < 5000; i++) {
+      characters.push({
+        name: `Personnage ${i + 1}`,
+        traits: {
+          fille: Math.random() < 0.5,
+          animal: Math.random() < 0.5,
+          masculin: Math.random() < 0.5,
+          tiktok: Math.random() < 0.5,
+          youtube: Math.random() < 0.5,
+          casquette: Math.random() < 0.5,
+          virtuel: Math.random() < 0.5
+        }
+      });
+    }
+
+    const questions = [];
+    const baseQuestions = [
+      { key: "fille", text: [
+        "Est-ce que ton personnage est une fille ?",
+        "Ton personnage est-il féminin ?",
+        "Est-ce une femme ?"
+      ]},
+      { key: "animal", text: [
+        "Est-ce que ton personnage est un animal ?",
+        "Ton personnage est-il une créature animale ?",
+        "Ton personnage a-t-il une forme animale ?"
+      ]},
+      { key: "masculin", text: [
+        "Ton personnage est-il un garçon ?",
+        "Est-ce que c’est un homme ?",
+        "Est-il masculin ?"
+      ]},
+      { key: "tiktok", text: [
+        "Est-ce qu’il est connu grâce à TikTok ?",
+        "Ton personnage publie-t-il sur TikTok ?",
+        "Est-il célèbre sur TikTok ?"
+      ]},
+      { key: "youtube", text: [
+        "Est-ce qu’il est célèbre sur YouTube ?",
+        "Ton personnage a-t-il une chaîne YouTube ?",
+        "Est-ce qu’il fait des vidéos YouTube ?"
+      ]},
+      { key: "casquette", text: [
+        "Ton personnage porte-t-il une casquette ?",
+        "Est-ce qu’il est souvent vu avec une casquette ?",
+        "A-t-il un couvre-chef ?"
+      ]},
+      { key: "virtuel", text: [
+        "Ton personnage est-il virtuel ?",
+        "Est-ce qu’il vit dans un monde numérique ?",
+        "Ton personnage est-il généré par ordinateur ?"
+      ]}
+    ];
+
+    for (let i = 0; i < 10000; i++) {
+      const trait = baseQuestions[i % baseQuestions.length];
+      const variant = trait.text[Math.floor(Math.random() * trait.text.length)];
+      questions.push({ text: variant, key: trait.key });
+    }
+
+    let current = 0;
+    let possibilities = [...characters];
+
+    function showNextQuestion() {
+      if (current >= questions.length || possibilities.length === 1) {
+        const questionElement = document.querySelector(".question");
+        if (possibilities.length === 0) {
+          questionElement.textContent = "Je n'ai pas pu deviner 😢";
+        } else {
+          questionElement.textContent = `Je pense à : ${possibilities[0].name} ! 🤖`;
+        }
+        return;
+      }
+
+      const questionElement = document.querySelector(".question");
+      questionElement.textContent = questions[current].text;
+      const audio = document.getElementById("robot-voice");
+      if (audio) audio.play();
+    }
+
+    function filterCharacters(answer) {
+      const key = questions[current].key;
+      if (answer === "oui") possibilities = possibilities.filter(c => c.traits[key] === true);
+      if (answer === "non") possibilities = possibilities.filter(c => c.traits[key] === false);
+      current++;
+      showNextQuestion();
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      showNextQuestion();
+      const buttons = document.querySelectorAll(".response-button");
+      buttons[0].addEventListener("click", () => filterCharacters("oui"));
+      buttons[1].addEventListener("click", () => filterCharacters("non"));
+      buttons[2].addEventListener("click", () => filterCharacters("peut-être"));
+    });
+  </script>
+</head>
+<body>
+  <audio id="robot-voice" src="/mnt/data/voix_robotique_question.mp3"></audio>
+
+  <div class="logo">
+    <img src="/mnt/data/d11ce887-a393-477f-8e8d-63b03eab8537.jpg" alt="Robot Logo">
+  </div>
+
+  <h1>Bienvenue sur mon petit robot !<br>Il peut deviner ce que tu penses 🤖</h1>
+
+  <div class="question-box">
+    <div class="question">
+      Chargement...
+    </div>
+
+    <div class="responses">
+      <button class="response-button">Oui</button>
+      <button class="response-button">Non</button>
+      <button class="response-button">Peut-être</button>
+
+      <div class="response-area">
+        <img src="/mnt/data/d11ce887-a393-477f-8e8d-63b03eab8537.jpg" alt="Avatar Robot">
+        <input type="text" placeholder="Réponse personnalisée...">
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>Version P3 très robotique en développement...</p>
+  </div>
+</body>
+</html>
+
