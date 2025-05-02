@@ -175,8 +175,18 @@
       const question = shuffledQuestions[current];
       askedKeys.add(question.key);
       document.querySelector(".question").textContent = question.text;
-      const audio = document.getElementById("robot-voice");
-      if (audio) audio.play();
+      const audio = document.querySelector(".question").textContent = question.text;
+speak(question.text);
+function speak(text) {
+  const synth = window.speechSynthesis;
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "fr-FR";
+  utterance.pitch = 1;
+  utterance.rate = 1;
+  synth.cancel(); // stop previous if any
+  synth.speak(utterance);
+}
+
     }
 
     function filterCharacters(answer) {
