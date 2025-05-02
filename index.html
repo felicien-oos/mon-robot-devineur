@@ -91,7 +91,7 @@
   </style>
 </head>
 <body>
-  <audio id="robot-voice" src="voix_robotique_question.mp3"></audio>
+  <audio id="robot-voice" src="https://upload.wikimedia.org/wikipedia/commons/8/84/Beep-beep.mp3"></audio>
 
   <div class="logo">
     <img src="logo_robot.jpg" alt="Robot Logo">
@@ -119,7 +119,23 @@
   </div>
 
   <script>
-    const traits = Array.from({ length: 5000 }, (_, i) => `trait_${i + 1}`);
+    const traits = [
+      "a des lunettes", "porte un chapeau", "est un animal", "parle plusieurs langues",
+      "est un super-héros", "est un méchant", "est une femme", "a une moustache",
+      "est un enfant", "porte des vêtements rouges", "vit dans un château", "vole dans le ciel",
+      "vient de l’espace", "a une voix grave", "est timide", "a beaucoup d’amis",
+      "est très intelligent", "a une épée", "est petit", "est très grand",
+      "porte un uniforme", "a des pouvoirs magiques", "a une queue", "est un robot",
+      "vit sous l’eau", "est connu sur Internet", "est très rapide", "est très fort",
+      "est un animal domestique", "est célèbre pour ses blagues", "a un accent",
+      "a des cheveux bleus", "utilise un ordinateur", "porte des lunettes de soleil",
+      "a un animal de compagnie", "a un frère ou une sœur", "a peur du noir",
+      "est une star de la télévision", "travaille à l’école", "a une grande bouche",
+      "est un personnage de dessin animé", "vit dans une forêt", "mange souvent des gâteaux",
+      "porte des bottes", "est curieux", "est un extraterrestre", "porte une cape",
+      "est un héros de jeu vidéo", "parle avec une voix bizarre", "a un rire unique",
+      "est souvent en colère", "est toujours joyeux"
+    ];
 
     const characters = Array.from({ length: 10000 }, (_, i) => {
       const traitsObj = {};
@@ -132,7 +148,7 @@
       };
     });
 
-    const questions = traits.map(trait => ({ text: `Ton personnage a-t-il le trait suivant : ${trait} ?`, key: trait }));
+    const questions = traits.map(trait => ({ text: `Ton personnage ${trait} ?`, key: trait }));
     const shuffledQuestions = questions.sort(() => 0.5 - Math.random());
 
     let current = 0;
@@ -166,11 +182,8 @@
     function filterCharacters(answer) {
       const key = shuffledQuestions[current]?.key;
       if (!key) return;
-
       if (answer === "oui") possibilities = possibilities.filter(c => c.traits[key] === true);
       else if (answer === "non") possibilities = possibilities.filter(c => c.traits[key] === false);
-      else if (answer === "peut-être") possibilities = possibilities.filter(c => c.traits[key] !== undefined);
-
       current++;
       showNextQuestion();
     }
@@ -194,3 +207,5 @@
   </script>
 </body>
 </html>
+
+       
